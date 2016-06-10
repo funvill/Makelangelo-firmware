@@ -764,13 +764,6 @@ void tools_setup() {
 }
 
 
-void Limit_init() {
-  #ifdef USE_LIMIT_SWITCH
-    // get the current switch state
-    pinMode(MOTOR_0_LIMIT_SWITCH_PIN,INPUT);
-    pinMode(MOTOR_1_LIMIT_SWITCH_PIN,INPUT);
-  #endif // USE_LIMIT_SWITCH
-} 
 
 //------------------------------------------------------------------------------
 void setup() {
@@ -789,7 +782,6 @@ void setup() {
   //easyPWM_init();
   SD_init();
   LCD_init();
-  Limit_init(); 
 
   // initialize the plotter position.
   teleport(0,0);
