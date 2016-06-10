@@ -11,14 +11,14 @@
 //------------------------------------------------------------------------------
 // CONSTANTS
 //------------------------------------------------------------------------------
-//#define VERBOSE           (1)  // add to get a lot more serial output.
-#define HAS_SD  // comment this out if there is no SD card
-#define HAS_LCD  // comment this out if there is no SMART LCD controller
-//#define USE_LIMIT_SWITCH  (1)  // Comment out this line to disable findHome and limit switches
+#define VERBOSE           (1)  // add to get a lot more serial output.
+// #define HAS_SD  // comment this out if there is no SD card
+// #define HAS_LCD  // comment this out if there is no SMART LCD controller
+#define USE_LIMIT_SWITCH  (1)  // Comment out this line to disable findHome and limit switches
 
 // machine style
-#define POLARGRAPH2  // uncomment this line if you use a polargraph like the Makelangelo
-//#define COREXY  // uncomment this line if you use a CoreXY setup.
+// #define POLARGRAPH2  // uncomment this line if you use a polargraph like the Makelangelo
+#define COREXY  // uncomment this line if you use a CoreXY setup.
 //#define TRADITIONALXY  // uncomment this line if you use a traditional XY setup.
 //#define ZARPLOTTER  // uncomment this line if you use a 4 motor ZAR plotter
 
@@ -30,7 +30,6 @@
 #define BAUD                 (57600)  // How fast is the Arduino talking?
 #define MAX_BUF              (64)  // What is the longest message Arduino can store?
 
-
 #define MICROSTEPS           (16.0)  // microstepping on this microcontroller
 #define STEPS_PER_TURN       (400 * MICROSTEPS)  // default number of steps per turn * microsteps
 
@@ -39,7 +38,7 @@
 #define DEFAULT_FEEDRATE     (8500.0)
 #define DEFAULT_ACCELERATION (250)
 
-#define STEP_DELAY           (150)  // delay between steps, in microseconds, when doing fixed tasks like homing
+#define STEP_DELAY           (0)  // delay between steps, in microseconds, when doing fixed tasks like homing
 
 #define NUM_AXIES            (3)  // x,y,z
 #define NUM_TOOLS            (6)
@@ -79,8 +78,8 @@
 #define BOARD_SANGUINOLULU 3
 
 // Your choice of board
-#define MOTHERBOARD BOARD_RUMBA
-//#define MOTHERBOARD BOARD_RAMPS
+// #define MOTHERBOARD BOARD_RUMBA
+#define MOTHERBOARD BOARD_RAMPS
 //#define MOTHERBOARD BOARD_SANGUINOLULU
 
 #if MOTHERBOARD == BOARD_RUMBA 

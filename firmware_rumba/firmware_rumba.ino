@@ -11,9 +11,7 @@
 // INCLUDES
 //------------------------------------------------------------------------------
 #include "configure.h"
-
 #include <SPI.h>  // pkm fix for Arduino 1.5
-
 #include "Vector3.h"
 
 
@@ -86,8 +84,19 @@ float atan3(float dy,float dx) {
 //------------------------------------------------------------------------------
 char readSwitches() {
 #ifdef USE_LIMIT_SWITCH
+
+  // Check to see if we have hit a limit swich 
+  if (! digitalRead(MOTOR_0_LIMIT_SWITCH_PIN) ) {
+    Serial.println(F("Y Limit Switch"));
+    return true ;
+  } 
+  if (! digitalRead(MOTOR_1_LIMIT_SWITCH_PIN) ) {
+    Serial.println(F("X Limit switch"));
+    return true ;
+  } 
+
   // get the current switch state
-  return ( (analogRead(L_PIN) < SWITCH_HALF) | (analogRead(R_PIN) < SWITCH_HALF) );
+  return ( (! digitalRead(MOTOR_0_LIMIT_SWITCH_PIN) ) || (! analogRead(MOTOR_1_LIMIT_SWITCH_PIN)) );
 #else
   return 0;
 #endif  // USE_LIMIT_SWITCH
@@ -294,6 +303,7 @@ void polargraph_line(float x,float y,float z,float new_feed_rate) {
   Serial.print(l2);  Serial.print('\n');
   */
   feed_rate = new_feed_rate;
+
   motor_line(l1,l2,z,new_feed_rate);
 }
 
@@ -431,10 +441,26 @@ void FindHome() {
     return;
   }
 
-  int safe_out=50;
+  // ToDo: This needs to be updated to use line_safe() function instead of 
+  //       direct controlling the motors.  
 
-  // reel in the left motor until contact is made.
-  Serial.println(F("Find left..."));
+
+  // Bottom 
+  // ======================================
+  Serial.println(F("Find bottom..."));
+  digitalWrite(motors[0].dir_pin,LOW);
+  digitalWrite(motors[1].dir_pin,HIGH);
+  do {
+    digitalWrite(motors[0].step_pin,LOW);
+    digitalWrite(motors[0].step_pin,HIGH);
+    digitalWrite(motors[1].step_pin,LOW);
+    digitalWrite(motors[1].step_pin,HIGH);
+    pause(STEP_DELAY);
+  } while(!readSwitches());
+
+  Serial.println(F("Found bottom... "));
+  Serial.println(F("Backing off until the swich is not hit. "));
+
   digitalWrite(motors[0].dir_pin,HIGH);
   digitalWrite(motors[1].dir_pin,LOW);
   do {
@@ -443,40 +469,41 @@ void FindHome() {
     digitalWrite(motors[1].step_pin,HIGH);
     digitalWrite(motors[1].step_pin,LOW);
     pause(STEP_DELAY);
-  } while(!readSwitches());
+  } while(readSwitches());
+  Serial.println(F("Done bottom..."));
 
-  // back off so we don't get a false positive on the next motor
-  int i;
-  digitalWrite(motors[0].dir_pin,LOW);
-  for(i=0;i<safe_out;++i) {
-    digitalWrite(motors[0].step_pin,HIGH);
-    digitalWrite(motors[0].step_pin,LOW);
-    pause(STEP_DELAY);
-  }
 
-  // reel in the right motor until contact is made
-  Serial.println(F("Find right..."));
-  digitalWrite(motors[0].dir_pin,LOW);
+  // Right 
+  // ======================================
+  Serial.println(F("Find Right..."));
+  digitalWrite(motors[0].dir_pin,HIGH);
   digitalWrite(motors[1].dir_pin,HIGH);
   do {
-    digitalWrite(motors[0].step_pin,HIGH);
     digitalWrite(motors[0].step_pin,LOW);
-    digitalWrite(motors[1].step_pin,HIGH);
+    digitalWrite(motors[0].step_pin,HIGH);
     digitalWrite(motors[1].step_pin,LOW);
+    digitalWrite(motors[1].step_pin,HIGH);
     pause(STEP_DELAY);
-    laststep1++;
   } while(!readSwitches());
 
-  // back off so we don't get a false positive that kills line()
+  Serial.println(F("Found Right... "));
+  Serial.println(F("Backing off until the swich is not hit. "));
+
+  digitalWrite(motors[0].dir_pin,LOW);
   digitalWrite(motors[1].dir_pin,LOW);
-  for(i=0;i<safe_out;++i) {
-    digitalWrite(motors[1].step_pin,HIGH);
+  do {
+    digitalWrite(motors[0].step_pin,LOW);
+    digitalWrite(motors[0].step_pin,HIGH);
     digitalWrite(motors[1].step_pin,LOW);
+    digitalWrite(motors[1].step_pin,HIGH);
     pause(STEP_DELAY);
-  }
+  } while(readSwitches());
+  Serial.println(F("Done Right..."));
 
   Serial.println(F("Centering..."));
-  polargraph_line(0,0,posz);
+  teleport(0,0); // These are hard coded for SWS's machine. 
+
+  // polargraph_line(0,0,posz);
 #endif // USE_LIMIT_SWITCH
 }
 
@@ -737,6 +764,14 @@ void tools_setup() {
 }
 
 
+void Limit_init() {
+  #ifdef USE_LIMIT_SWITCH
+    // get the current switch state
+    pinMode(MOTOR_0_LIMIT_SWITCH_PIN,INPUT);
+    pinMode(MOTOR_1_LIMIT_SWITCH_PIN,INPUT);
+  #endif // USE_LIMIT_SWITCH
+} 
+
 //------------------------------------------------------------------------------
 void setup() {
   LoadConfig();
@@ -754,6 +789,7 @@ void setup() {
   //easyPWM_init();
   SD_init();
   LCD_init();
+  Limit_init(); 
 
   // initialize the plotter position.
   teleport(0,0);
