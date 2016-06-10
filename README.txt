@@ -1,7 +1,7 @@
 This is a fork, to back up the code that is running on the Zen CNC garden at Vancouver's Mini Maker Faire 2016. I have done some minor changes that are only useful for my machine. Check out http://www.makelangelo.com/ for the good code. 
 
 
-YOU PROBABLY DON'T WANT THIS VERSION 
+##YOU PROBABLY DON'T WANT THIS VERSION ##
 Check out https://github.com/MarginallyClever/Makelangelo-firmware instead. 
 
 
