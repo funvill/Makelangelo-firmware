@@ -137,9 +137,20 @@ void printFeedRate() {
 //------------------------------------------------------------------------------
 // Inverse Kinematics - turns XY coordinates into lengths L1,L2
 void IK(float x, float y, long &l1, long &l2) {
+  
+
 #ifdef COREXY
-  l1 = lround((x+y) / threadPerStep);
-  l2 = lround((x-y) / threadPerStep);
+  l1 = lround((x-y) / threadPerStep);
+  l2 = (lround((x+y) / threadPerStep)) ;
+
+/*
+  Serial.print(F("IK x=")); Serial.print(x);
+  Serial.print(F(" y=")); Serial.print(y);
+  Serial.print(F(" l1=")); Serial.print(l1);
+  Serial.print(F(" l2=")); Serial.print(l2);
+ Serial.print(F("\n"));
+*/
+
 #endif
 #ifdef TRADITIONALXY
   l1 = lround((x) / threadPerStep);
@@ -162,6 +173,7 @@ void IK(float x, float y, long &l1, long &l2) {
 // use law of cosines: theta = acos((a*a+b*b-c*c)/(2*a*b));
 // to find angle between M1M2 and M1P where P is the plotter position.
 void FK(long l1, long l2,float &x,float &y) {
+  Serial.print(F("FK ")); 
 #ifdef COREXY
   l1 *= threadPerStep;
   l2 *= threadPerStep;
